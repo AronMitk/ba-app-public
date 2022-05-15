@@ -18,9 +18,14 @@ android {
         }
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.2.0-beta01"
+    }
+
     buildFeatures {
         compose = true
     }
+    namespace = "com.harrontech.vilniusobjectrecognizer.android"
 }
 
 dependencies {
@@ -49,11 +54,13 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.0.5")
     implementation("androidx.compose.runtime:runtime-rxjava2:1.0.5")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.5")
 
     implementation("io.ktor:ktor-client-android:2.0.0")
+    implementation("io.ktor:ktor-client-core:2.0.0")
 
     val cameraxVersion = "1.1.0-beta01"
     implementation("androidx.camera:camera-core:${cameraxVersion}")
@@ -65,6 +72,7 @@ dependencies {
 // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.8.6")
 
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
 
     // https://mvnrepository.com/artifact/com.google.accompanist/accompanist-pager
     var accompanistVersion = "0.24.2-alpha"

@@ -16,14 +16,9 @@ import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executor
 
-class ImageService(var context: Context, var number: Int, var delay: Long, onMediaCaptured: (ByteArray?) -> Unit) {
+class ImageService(var context: Context, onMediaCaptured: (ByteArray?) -> Unit) {
     fun takePictures(imageCapture: ImageCapture, executor: Executor){
-        GlobalScope.launch {
-            repeat(number){
-                imageCapture.takePicture(executor, imageCaptureCallback)
-                delay(delay)
-            }
-        }
+        imageCapture.takePicture(executor, imageCaptureCallback)
     }
 
     var imageCaptureCallback = object : ImageCapture.OnImageCapturedCallback() {

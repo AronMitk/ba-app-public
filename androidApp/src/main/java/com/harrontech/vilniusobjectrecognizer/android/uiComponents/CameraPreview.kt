@@ -24,7 +24,6 @@ import java.util.concurrent.Executor
 fun CameraPreview(
     context: Context,
     lifecycleOwner: LifecycleOwner,
-    onDrag: (inputChange: PointerInputChange) -> Unit,
     onDragStart : () -> Unit,
     onDragEnd: () -> Unit,
     setImageCapture: (ImageCapture, Executor) -> Unit
@@ -45,7 +44,6 @@ fun CameraPreview(
                         onLongPress = {
                             imageCapture?.let { it1 -> setImageCapture(it1, executor) }
                             onDragStart()
-
                         },
                         onPress = {
                             onDragEnd()

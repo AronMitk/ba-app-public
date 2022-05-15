@@ -15,6 +15,7 @@ import com.harrontech.vilniusobjectrecognizer.android.helpers.RequestsHelper
 import com.harrontech.vilniusobjectrecognizer.android.models.ObjectInfo
 import com.harrontech.vilniusobjectrecognizer.android.uiComponents.ObjectListCard
 import com.harrontech.vilniusobjectrecognizer.android.uiComponents.ObjectListCardData
+import kotlinx.coroutines.runBlocking
 
 class BugReportActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +24,9 @@ class BugReportActivity : AppCompatActivity() {
         var storage = RequestsHelper()
 
         var objectId = intent.getStringExtra("ID").toString()
-        var obj = storage.getObjectByID(objectId)
+        var obj = runBlocking {
+            storage.getObjectByID(objectId)
+        }
 
         Log.i("OBJECT_ID", objectId)
 

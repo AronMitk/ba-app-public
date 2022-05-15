@@ -1,9 +1,6 @@
 package com.harrontech.vilniusobjectrecognizer.android.uiComponents
 
 import android.annotation.SuppressLint
-import android.content.Context.MODE_APPEND
-import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import android.location.Location
 import androidx.camera.core.*
 import androidx.compose.foundation.layout.*
@@ -31,22 +28,19 @@ fun CameraOpen(onBugReportOpen: (id: String) -> Unit, onObjectInfoOpen: (id: Str
 
     var location: Location? by remember { mutableStateOf(null) }
 
-    var images = ArrayList<ByteArray>()
-
     var locationHelper = LocationHelper(context) {
         location = it
     }
 
-    var imageService = ImageService(context, 4, 250) {
-        it ?: return@ImageService
-        images.add(it)
-        Logger.e("IMAGES", images.size.toString())
+    var image: ByteArray? by remember { mutableStateOf(null) }
+
+    var imageService = ImageService(context) {
+        image = it
     }
 
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
-
 
     val coroutineScope = rememberCoroutineScope()
     var objectInfo: ObjectListCardData? by remember { mutableStateOf(null) }
@@ -84,15 +78,9 @@ fun CameraOpen(onBugReportOpen: (id: String) -> Unit, onObjectInfoOpen: (id: Str
             CameraPreview(
                 context = context,
                 lifecycleOwner = lifecycleOwner,
-                onDrag = { Logger.e("POSITION", it.position.toString()) },
                 onDragStart = {
                     locationHelper.getLastLocation()
-
-                    objectInfo = recognize(storage, location, images.map {
-                        Image(image = it)
-                    })
-
-                    images.clear()
+                    objectInfo = recognize(storage, location, image)
 
                     coroutineScope.launch {
                         bottomSheetScaffoldState.bottomSheetState.expand()
@@ -111,18 +99,22 @@ fun CameraOpen(onBugReportOpen: (id: String) -> Unit, onObjectInfoOpen: (id: Str
 
 }
 
-fun recognize(storage: RequestsHelper, location: Location?, images: List<Image>?): ObjectListCardData? {
+fun recognize(storage: RequestsHelper, location: Location?, image: ByteArray?): ObjectListCardData? {
     if (location != null) {
         var id = storage.recognizeObject(
-            UserDataRequest(
-                coordinates = Coordinates(
-                    location.latitude,
-                    location.longitude
-                ),
-                images = images
+            RecognitionRequest(
+                images = image,
+                deviceData = UserDataRequest(
+                    coordinates = Coordinates(
+                        location.latitude,
+                        location.longitude
+                    )
+                )
             )
         )!!
-        var result = storage.getObjectByID(id)
+        var result = runBlocking {
+            storage.getObjectByID(id)
+        }
 
         return ObjectListCardData(
             id = result!!.id,

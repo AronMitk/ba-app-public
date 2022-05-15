@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.harrontech.vilniusobjectrecognizer.android.helpers.DataFetchingHelper
 import com.harrontech.vilniusobjectrecognizer.android.helpers.RequestsHelper
 import com.harrontech.vilniusobjectrecognizer.android.models.ObjectInfo
+import kotlinx.coroutines.runBlocking
 
 class ObjectInfoViewModel : ViewModel() {
     private var _objectInfo = MutableLiveData<ObjectInfo>(null)
@@ -15,6 +16,8 @@ class ObjectInfoViewModel : ViewModel() {
     var storage  = RequestsHelper()
     
     fun setValue(id: String){
-        _objectInfo.value = storage.getObjectByID(id)
+        runBlocking {
+            _objectInfo.value = storage.getObjectByID(id)
+        }
     }
 }

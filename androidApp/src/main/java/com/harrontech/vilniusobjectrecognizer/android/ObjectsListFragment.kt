@@ -10,12 +10,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.harrontech.vilniusobjectrecognizer.android.helpers.DataFetchingHelper
 import com.harrontech.vilniusobjectrecognizer.android.helpers.RequestsHelper
 import com.harrontech.vilniusobjectrecognizer.android.uiComponents.NoResultObjectListView
 import com.harrontech.vilniusobjectrecognizer.android.uiComponents.ObjectsList
 import com.harrontech.vilniusobjectrecognizer.android.models.ObjectInfo
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ObjectsListFragmentViewModel : ViewModel(){
     val objectsList : MutableLiveData<MutableList<ObjectInfo>> = MutableLiveData(mutableListOf())
@@ -29,14 +32,23 @@ class ObjectsListFragmentViewModel : ViewModel(){
         objectsList.value?.clear()
 
         if(value.isEmpty()){
-            try {
-                var result = storage.getObjectsList()
-                if (result != null) objectsList.value!!.addAll(result)
-            } catch (e : Exception){
-                objectsList.value = mutableListOf()
+            runBlocking {
+                try{
+                    val result = storage.getObjectsList()
+                    if (result != null) {
+                        objectsList.value = result.toMutableList()
+                    }
+                } catch (e : Exception){
+                    objectsList.value = mutableListOf()
+                }
             }
         } else {
-            objectsList.value!!.addAll(storage.getFilteredObjectsList(value)!!)
+            runBlocking {
+                val result = storage.getFilteredObjectsList(value)
+                if (result != null) {
+                    objectsList.value = result.toMutableList()
+                }
+            }
         }
     }
 }
